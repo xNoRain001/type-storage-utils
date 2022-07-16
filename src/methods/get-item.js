@@ -1,4 +1,3 @@
-import error from '../utils/error'
 import RANDOMS from '../randoms/index'
 
 const strategies = {
@@ -33,7 +32,7 @@ const strategies = {
   },
 }
 
-const getItem = key => {
+const getItem = function (key) {
   try {
     const value = window.localStorage.getItem(key)
     

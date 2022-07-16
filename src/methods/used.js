@@ -1,5 +1,8 @@
-const used = () => {
-  const stored = Object.entries(localStorage)
+const used = function () {
+  const storageType = this === localStorage
+    ? 'localStorage'
+    : 'sessionStorage'
+  const stored = Object.entries(window[storageType])
   const storage = 5 * 1024 * 1024 // 5MB
   let _used = 0
 

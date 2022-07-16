@@ -20,10 +20,10 @@ npm i type-storage-utils
 
 ```javascript
 // npm
-import { localStorage } from 'type-storage-utils'
+import { localStorage, sessionStorage } from 'type-storage-utils'
 
 // src
-const { localStorage } = typeStorage
+const { localStorage, sessionStorage } = typeStorage
 ```
 
 ## API

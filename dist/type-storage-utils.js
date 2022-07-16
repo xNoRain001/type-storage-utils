@@ -24,10 +24,6 @@
     return !/^(object|function)$/.test(type) ? type : Object.prototype.toString.call(v).slice(8, -1).toLowerCase();
   };
 
-  var error = function error(v) {
-    throw new Error(v);
-  };
-
   var RANDOMS = "0.697504399278988";
 
   var strategies$1 = {
@@ -55,13 +51,15 @@
   };
 
   var setItem = function setItem(key, value) {
+    var storageType = this === localStorage ? 'localStorage' : 'sessionStorage';
+
     try {
       // get value's type
       var type = getType(value);
       value = strategies$1[type](value);
-      return window.localStorage.setItem(key, value);
+      return window[storageType].setItem(key, value);
     } catch (e) {
-      console.log(e); // error(e.message)
+      console.log(e);
     }
   };
 
@@ -122,23 +120,28 @@
   };
 
   var removeItem = function removeItem(key) {
+    var storageType = this === localStorage ? 'localStorage' : 'sessionStorage';
+
     try {
-      return window.localStorage.removeItem(key);
+      return window[storageType].removeItem(key);
     } catch (e) {
       error(e);
     }
   };
 
   var clear = function clear() {
+    var storageType = this === localStorage ? 'localStorage' : 'sessionStorage';
+
     try {
-      return window.localStorage.clear();
+      return window[storageType].clear();
     } catch (e) {
       error(e);
     }
   };
 
   var used = function used() {
-    var stored = Object.entries(localStorage);
+    var storageType = this === localStorage ? 'localStorage' : 'sessionStorage';
+    var stored = Object.entries(window[storageType]);
     var storage = 5 * 1024 * 1024; // 5MB
 
     var _used = 0;
@@ -164,6 +167,7 @@
     sessionStorage: {}
   };
   init(typeStorage.localStorage);
+  init(typeStorage.sessionStorage);
 
   return typeStorage;
 

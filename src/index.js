@@ -6,6 +6,7 @@ const typeStorage = {
 }
 
 init(typeStorage.localStorage)
+init(typeStorage.sessionStorage)
 
 export default typeStorage
 

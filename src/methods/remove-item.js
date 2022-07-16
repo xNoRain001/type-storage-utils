@@ -1,8 +1,10 @@
-import error from '../utils/error'
+const removeItem = function (key) {
+  const storageType = this === localStorage
+    ? 'localStorage'
+    : 'sessionStorage'
 
-const removeItem = key => {
   try {
-    return window.localStorage.removeItem(key)
+    return window[storageType].removeItem(key)
   } catch (e) {
     error(e)
   }

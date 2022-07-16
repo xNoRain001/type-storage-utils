@@ -1,8 +1,10 @@
-import error from '../utils/error'
+const clear = function () {
+  const storageType = this === localStorage
+    ? 'localStorage'
+    : 'sessionStorage'
 
-const clear = () => {
   try {
-    return window.localStorage.clear()
+    return window[storageType].clear()
   } catch (e) {
     error(e)
   }
