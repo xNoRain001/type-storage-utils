@@ -30,15 +30,19 @@ const strategies = {
   object (value) {
     return JSON.parse(value)
   },
+
+  date (value) {
+    return new Date(value)
+  }
 }
 
 const getItem = function (key) {
   try {
     const value = window.localStorage.getItem(key)
-    
+
     // nonexistent key
     if (value === null) {
-      return null
+      return value
     }
 
     const parts = value.split('|')
@@ -51,7 +55,7 @@ const getItem = function (key) {
 
     return value
   } catch (e) {
-    error(e)
+    console.error(e)
   }
 }
 

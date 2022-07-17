@@ -47,6 +47,9 @@
     },
     object: function object(value) {
       return "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
+    },
+    date: function date(value) {
+      return "".concat(RANDOMS, "|date|").concat(value);
     }
   };
 
@@ -59,7 +62,7 @@
       value = strategies$1[type](value);
       return window[storageType].setItem(key, value);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -94,6 +97,9 @@
     },
     object: function object(value) {
       return JSON.parse(value);
+    },
+    date: function date(value) {
+      return new Date(value);
     }
   };
 
@@ -102,7 +108,7 @@
       var value = window.localStorage.getItem(key); // nonexistent key
 
       if (value === null) {
-        return null;
+        return value;
       }
 
       var parts = value.split('|');
@@ -115,7 +121,7 @@
 
       return value;
     } catch (e) {
-      error(e);
+      console.error(e);
     }
   };
 
@@ -125,7 +131,7 @@
     try {
       return window[storageType].removeItem(key);
     } catch (e) {
-      error(e);
+      console.error(e);
     }
   };
 
@@ -135,7 +141,7 @@
     try {
       return window[storageType].clear();
     } catch (e) {
-      error(e);
+      console.log(e);
     }
   };
 

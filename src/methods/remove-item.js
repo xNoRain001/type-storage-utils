@@ -6,7 +6,7 @@ const removeItem = function (key) {
   try {
     return window[storageType].removeItem(key)
   } catch (e) {
-    error(e)
+    console.error(e)
   }
 }
 export default removeItem

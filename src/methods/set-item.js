@@ -29,6 +29,10 @@ const strategies = {
   object (value) {
     return `${ RANDOMS }|object|${ JSON.stringify(value) }`
   },
+
+  date (value) {
+    return `${ RANDOMS }|date|${ value }`
+  }
 }
 
 const setItem = function (key, value) {
@@ -43,7 +47,7 @@ const setItem = function (key, value) {
     value = strategies[type](value)
     return window[storageType].setItem(key, value)
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 

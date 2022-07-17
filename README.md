@@ -1,6 +1,22 @@
 ## 介绍
 
-带类型的本地存储，支持 string | number | boolean | null | undefined | array | object
+带类型的本地存储，支持
+
+  - string
+
+  - number 
+
+  - boolean 
+
+  - null 
+
+  - undefined 
+
+  - array
+
+  - object
+
+  - date
 
 ## 下载
 

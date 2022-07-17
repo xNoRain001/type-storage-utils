@@ -6,7 +6,7 @@ const clear = function () {
   try {
     return window[storageType].clear()
   } catch (e) {
-    error(e)
+    console.log(e)
   }
 }
 
