@@ -1,4 +1,5 @@
 import RANDOMS from '../randoms/index'
+import { error, getStorageType } from "../utils/index"
 
 const strategies = {
   string (value) {
@@ -37,8 +38,10 @@ const strategies = {
 }
 
 const getItem = function (key) {
+  const storageType = getStorageType.call(this)
+
   try {
-    const value = window.localStorage.getItem(key)
+    const value = window[storageType].getItem(key)
 
     // nonexistent key
     if (value === null) {
@@ -46,7 +49,7 @@ const getItem = function (key) {
     }
 
     const parts = value.split('|')
-    const hasType = parts[0] === RANDOMS
+    const hasType = parts[0] == RANDOMS
     
     if (hasType) {
       const type = parts[1]
@@ -55,7 +58,7 @@ const getItem = function (key) {
 
     return value
   } catch (e) {
-    console.error(e)
+    error(e)
   }
 }
 

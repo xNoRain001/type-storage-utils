@@ -1,3 +1,3 @@
-const RANDOMS = "0.697504399278988"
+const RANDOMS = '0.697504399278988'
 
 export default RANDOMS

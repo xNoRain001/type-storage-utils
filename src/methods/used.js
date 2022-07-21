@@ -1,18 +1,15 @@
+import { getStorageType } from "../utils/index"
+
 const used = function () {
-  const storageType = this === localStorage
-    ? 'localStorage'
-    : 'sessionStorage'
-  const stored = Object.entries(window[storageType])
-  const storage = 5 * 1024 * 1024 // 5MB
+  const storageType = getStorageType.call(this)
+  const maxLength = 5 * 1024 * 1024 // 5MB
   let _used = 0
-
-  for (let i = 0, l = stored.length; i < l; i++) {
-    const item = stored[i]
-
-    _used += (item[0].length + item[1].length)
+  
+  for (const [key, value] of Object.entries(window[storageType])) {
+    _used += (key.length + value.length)
   }
 
-  return `${ (_used / storage).toFixed(6) }%`
+  return `${ (_used / maxLength).toFixed(6) }%`
 }
 
 export default used

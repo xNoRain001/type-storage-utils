@@ -1,5 +1,6 @@
-import getType from "../utils/type"
 import RANDOMS from '../randoms/index'
+import { error } from "../utils/index"
+import { getType, getStorageType } from "../utils/index"
 
 const strategies = {
   string (value) {
@@ -36,18 +37,17 @@ const strategies = {
 }
 
 const setItem = function (key, value) {
-  const storageType = this === localStorage
-    ? 'localStorage'
-    : 'sessionStorage'
+  const storageType = getStorageType.call(this)
 
   try {
 
     // get value's type
     const type = getType(value)
     value = strategies[type](value)
+
     return window[storageType].setItem(key, value)
   } catch (e) {
-    console.error(e)
+    error(e)
   }
 }
 

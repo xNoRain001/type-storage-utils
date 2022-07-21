@@ -1,12 +1,12 @@
+import { error, getStorageType } from "../utils/index"
+
 const clear = function () {
-  const storageType = this === localStorage
-    ? 'localStorage'
-    : 'sessionStorage'
+  const storageType = getStorageType.call(this)
 
   try {
     return window[storageType].clear()
   } catch (e) {
-    console.log(e)
+    error(e)
   }
 }
 

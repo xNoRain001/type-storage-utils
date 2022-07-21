@@ -6,12 +6,12 @@ import {
   used
 } from "../methods/index"
 
-const init = function (localStorage) {
-  localStorage.setItem = setItem
-  localStorage.getItem = getItem
-  localStorage.removeItem = removeItem
-  localStorage.clear = clear
-  localStorage.used = used
+const init = storage => {
+  storage.setItem = setItem
+  storage.getItem = getItem
+  storage.removeItem = removeItem
+  storage.clear = clear
+  storage.used = used
 }
 
 export default init
