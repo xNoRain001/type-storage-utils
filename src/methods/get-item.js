@@ -1,5 +1,5 @@
 import RANDOMS from '../randoms/index'
-import { error, getStorageType } from "../utils/index"
+import { error, expiredHandler, getStorageType, isExpired } from "../utils/index"
 
 const strategies = {
   string (value) {
@@ -38,9 +38,8 @@ const strategies = {
 }
 
 const getItem = function (key) {
-  const storageType = getStorageType.call(this)
-
   try {
+    const storageType = getStorageType.call(this)
     const value = window[storageType].getItem(key)
 
     // nonexistent key
@@ -49,11 +48,25 @@ const getItem = function (key) {
     }
 
     const parts = value.split('|')
-    const hasType = parts[0] == RANDOMS
-    
+    const hasType = parts[0] === RANDOMS
+    const segments = parts[2].split('-')
+    const hasConfig = segments[0] === RANDOMS
+
     if (hasType) {
       const type = parts[1]
-      return strategies[type](value.slice(RANDOMS.length + type.length + 2))
+
+      if (hasConfig) {
+        const { expiredTime } = JSON.parse(segments[1])
+
+        if (isExpired(expiredTime)) {
+          expiredHandler()
+          return
+        } 
+      }
+      
+      return hasConfig
+        ? strategies[type](segments[2])
+        : strategies[type](value.slice(RANDOMS.length + type.length + 2))
     } 
 
     return value

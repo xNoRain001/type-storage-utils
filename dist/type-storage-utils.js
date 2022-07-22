@@ -93,41 +93,48 @@
     return this === typeStorage.localStorage ? 'localStorage' : 'sessionStorage';
   };
 
+  var isExpired = function isExpired(expiredTime) {
+    return Date.now() >= expiredTime;
+  };
+
+  var expiredHandler = function expiredHandler() {};
+
   var strategies$1 = {
-    string: function string(value) {
-      return "".concat(RANDOMS, "|string|").concat(value);
+    string: function string(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|string|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|string|").concat(value);
     },
-    number: function number(value) {
-      return "".concat(RANDOMS, "|number|").concat(value);
+    number: function number(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|number|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|number|").concat(value);
     },
-    "boolean": function boolean(value) {
-      return "".concat(RANDOMS, "|boolean|").concat(value);
+    "boolean": function boolean(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|boolean|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|boolean|").concat(value);
     },
-    "null": function _null(value) {
-      return "".concat(RANDOMS, "|null|").concat(value);
+    "null": function _null(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|null|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|null|").concat(value);
     },
-    undefined: function undefined$1(value) {
-      return "".concat(RANDOMS, "|undefined|").concat(value);
+    undefined: function undefined$1(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|undefined|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|undefined|").concat(value);
     },
-    array: function array(value) {
-      return "".concat(RANDOMS, "|array|").concat(JSON.stringify(value));
+    array: function array(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|array|").concat(RANDOMS, "-").concat(configStr, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|array|").concat(JSON.stringify(value));
     },
-    object: function object(value) {
-      return "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
+    object: function object(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|object|").concat(RANDOMS, "-").concat(configStr, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
     },
-    date: function date(value) {
-      return "".concat(RANDOMS, "|date|").concat(value);
+    date: function date(value, configStr) {
+      return configStr ? "".concat(RANDOMS, "|date|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|date|").concat(value);
     }
   };
 
-  var setItem = function setItem(key, value) {
-    var storageType = getStorageType.call(this);
-
+  var setItem = function setItem(key, value, config) {
     try {
-      // get value's type
+      var storageType = getStorageType.call(this);
       var type = getType(value);
-      value = strategies$1[type](value);
-      return window[storageType].setItem(key, value);
+      var expiredTime = config.expiredTime;
+      config.expiredTime = getType(expiredTime) === 'number' ? Date.now() + expiredTime * 1000 : expiredTime.getTime();
+      var configStr = JSON.stringify(config);
+      var formattedValue = strategies$1[type](value, configStr);
+      return window[storageType].setItem(key, formattedValue);
     } catch (e) {
       error(e);
     }
@@ -171,9 +178,8 @@
   };
 
   var getItem = function getItem(key) {
-    var storageType = getStorageType.call(this);
-
     try {
+      var storageType = getStorageType.call(this);
       var value = window[storageType].getItem(key); // nonexistent key
 
       if (value === null) {
@@ -181,11 +187,24 @@
       }
 
       var parts = value.split('|');
-      var hasType = parts[0] == RANDOMS;
+      var hasType = parts[0] === RANDOMS;
+      var segments = parts[2].split('-');
+      var hasConfig = segments[0] === RANDOMS;
 
       if (hasType) {
         var type = parts[1];
-        return strategies[type](value.slice(RANDOMS.length + type.length + 2));
+
+        if (hasConfig) {
+          var _JSON$parse = JSON.parse(segments[1]),
+              expiredTime = _JSON$parse.expiredTime;
+
+          if (isExpired(expiredTime)) {
+            expiredHandler();
+            return;
+          }
+        }
+
+        return hasConfig ? strategies[type](segments[2]) : strategies[type](value.slice(RANDOMS.length + type.length + 2));
       }
 
       return value;
@@ -195,9 +214,8 @@
   };
 
   var removeItem = function removeItem(key) {
-    var storageType = getStorageType.call(this);
-
     try {
+      var storageType = getStorageType.call(this);
       return window[storageType].removeItem(key);
     } catch (e) {
       error(e);
@@ -205,9 +223,8 @@
   };
 
   var clear = function clear() {
-    var storageType = getStorageType.call(this);
-
     try {
+      var storageType = getStorageType.call(this);
       return window[storageType].clear();
     } catch (e) {
       error(e);

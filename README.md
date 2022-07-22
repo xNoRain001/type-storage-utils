@@ -1,6 +1,6 @@
 ## 介绍
 
-带类型的本地存储，支持
+带类型的本地存储，支持：
 
   - string
 
@@ -42,7 +42,7 @@ import { localStorage, sessionStorage } from 'type-storage-utils'
 const { localStorage, sessionStorage } = typeStorage
 ```
 
-## API
+## APIs
 
 ### setItem
 

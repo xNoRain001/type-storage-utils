@@ -1,9 +1,9 @@
 import { error, getStorageType } from "../utils/index"
 
 const removeItem = function (key) {
-  const storageType = getStorageType.call(this)
-
   try {
+    const storageType = getStorageType.call(this)
+
     return window[storageType].removeItem(key)
   } catch (e) {
     error(e)
