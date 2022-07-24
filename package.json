@@ -1,13 +1,14 @@
 {
   "name": "type-storage-utils",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Web storage with type",
   "keywords": [
     "type-storage-utils",
     "type-storage",
     "web-storage",
     "local-storage",
-    "session-storage"
+    "session-storage",
+    "expired-storage"
   ],
   "author": "Zhang Meixue",
   "repository": {

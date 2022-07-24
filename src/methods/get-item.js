@@ -60,10 +60,11 @@ const getItem = function (key) {
       }
 
       const type = parts[1]
+      const _value = hasExpiredTime
+        ? parts[2].slice(RANDOMS.length + expiredTime.length + 2)
+        : value.slice(RANDOMS.length + type.length + 2)
       
-      return hasExpiredTime
-        ? strategies[type](parts[2].slice(RANDOMS.length + expiredTime.length + 2))
-        : strategies[type](value.slice(RANDOMS.length + type.length + 2))
+      return strategies[type](_value)
     } 
 
     return value
