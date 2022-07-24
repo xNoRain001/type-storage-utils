@@ -97,43 +97,39 @@
     return Date.now() >= expiredTime;
   };
 
-  var expiredHandler = function expiredHandler() {};
-
   var strategies$1 = {
-    string: function string(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|string|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|string|").concat(value);
+    string: function string(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|string|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|string|").concat(value);
     },
-    number: function number(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|number|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|number|").concat(value);
+    number: function number(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|number|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|number|").concat(value);
     },
-    "boolean": function boolean(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|boolean|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|boolean|").concat(value);
+    "boolean": function boolean(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|boolean|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|boolean|").concat(value);
     },
-    "null": function _null(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|null|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|null|").concat(value);
+    "null": function _null(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|null|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|null|").concat(value);
     },
-    undefined: function undefined$1(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|undefined|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|undefined|").concat(value);
+    undefined: function undefined$1(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|undefined|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|undefined|").concat(value);
     },
-    array: function array(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|array|").concat(RANDOMS, "-").concat(configStr, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|array|").concat(JSON.stringify(value));
+    array: function array(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|array|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|array|").concat(JSON.stringify(value));
     },
-    object: function object(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|object|").concat(RANDOMS, "-").concat(configStr, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
+    object: function object(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|object|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
     },
-    date: function date(value, configStr) {
-      return configStr ? "".concat(RANDOMS, "|date|").concat(RANDOMS, "-").concat(configStr, "-").concat(value) : "".concat(RANDOMS, "|date|").concat(value);
+    date: function date(value, expiredTime) {
+      return expiredTime ? "".concat(RANDOMS, "|date|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|date|").concat(value);
     }
   };
 
-  var setItem = function setItem(key, value, config) {
+  var setItem = function setItem(key, value, expiredTime) {
     try {
       var storageType = getStorageType.call(this);
       var type = getType(value);
-      var expiredTime = config.expiredTime;
-      config.expiredTime = getType(expiredTime) === 'number' ? Date.now() + expiredTime * 1000 : expiredTime.getTime();
-      var configStr = JSON.stringify(config);
-      var formattedValue = strategies$1[type](value, configStr);
+      expiredTime = getType(expiredTime) === 'number' ? Date.now() + expiredTime * 1000 : expiredTime.getTime();
+      var formattedValue = strategies$1[type](value, expiredTime);
       return window[storageType].setItem(key, formattedValue);
     } catch (e) {
       error(e);
@@ -189,22 +185,17 @@
       var parts = value.split('|');
       var hasType = parts[0] === RANDOMS;
       var segments = parts[2].split('-');
-      var hasConfig = segments[0] === RANDOMS;
+      var hasExpiredTime = segments[0] === RANDOMS;
 
       if (hasType) {
-        var type = parts[1];
+        var expiredTime = segments[1];
 
-        if (hasConfig) {
-          var _JSON$parse = JSON.parse(segments[1]),
-              expiredTime = _JSON$parse.expiredTime;
-
-          if (isExpired(expiredTime)) {
-            expiredHandler();
-            return;
-          }
+        if (hasExpiredTime && isExpired(expiredTime)) {
+          return null;
         }
 
-        return hasConfig ? strategies[type](segments[2]) : strategies[type](value.slice(RANDOMS.length + type.length + 2));
+        var type = parts[1];
+        return hasExpiredTime ? strategies[type](parts[2].slice(RANDOMS.length + expiredTime.length + 2)) : strategies[type](value.slice(RANDOMS.length + type.length + 2));
       }
 
       return value;

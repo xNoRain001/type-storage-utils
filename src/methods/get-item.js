@@ -1,5 +1,5 @@
 import RANDOMS from '../randoms/index'
-import { error, expiredHandler, getStorageType, isExpired } from "../utils/index"
+import { error, getStorageType, isExpired } from "../utils/index"
 
 const strategies = {
   string (value) {
@@ -50,22 +50,19 @@ const getItem = function (key) {
     const parts = value.split('|')
     const hasType = parts[0] === RANDOMS
     const segments = parts[2].split('-')
-    const hasConfig = segments[0] === RANDOMS
+    const hasExpiredTime = segments[0] === RANDOMS
 
     if (hasType) {
-      const type = parts[1]
+      const expiredTime = segments[1]
 
-      if (hasConfig) {
-        const { expiredTime } = JSON.parse(segments[1])
-
-        if (isExpired(expiredTime)) {
-          expiredHandler()
-          return
-        } 
+      if (hasExpiredTime && isExpired(expiredTime)) {
+        return null
       }
+
+      const type = parts[1]
       
-      return hasConfig
-        ? strategies[type](segments[2])
+      return hasExpiredTime
+        ? strategies[type](parts[2].slice(RANDOMS.length + expiredTime.length + 2))
         : strategies[type](value.slice(RANDOMS.length + type.length + 2))
     } 
 

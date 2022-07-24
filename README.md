@@ -1,6 +1,6 @@
 ## 介绍
 
-带类型的本地存储，支持：
+带类型的本地存储，同时还提供设置过期时间，支持的数据类型有：
 
   - string
 
@@ -48,12 +48,15 @@ const { localStorage, sessionStorage } = typeStorage
 
 ```javascript
 /**
- * 设置本地存储
+ * 设置本地存储，支持设置过期时间，当访问过期的数据时，会返回 null。
  * 
  * @param {string} key - 键名
  * @param {*} value - 键值
+ * @param {(number|Date)} [expiredTime] - 过期时间，接收数字或日期
+ *  - 数字 60 代表将在一分钟后过期
+ *  - 日期 Sun Jul 24 2022 12:54:33 GMT+0800 (中国标准时间) 代表将在这个时间过期
  */
-localStorage.setItem('foo', { bar: 'bar' })
+localStorage.setItem('foo', { bar: 'bar' }, 60)
 ```
 
 ### getItem
