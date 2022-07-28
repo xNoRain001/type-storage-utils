@@ -3,65 +3,49 @@ import { error } from "../utils/index"
 import { getType, getStorageType } from "../utils/index"
 
 const strategies = {
-  string (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|string|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|string|${ value }`
+  string (value, timestamp) {
+    return `${ RANDOMS }|string|${ RANDOMS }-${ timestamp || null }-${ value }`
   },
 
-  number (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|number|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|number|${ value }`
+  number (value, timestamp) {
+    return `${ RANDOMS }|number|${ RANDOMS }-${ timestamp || null }-${ value }`
   },
 
-  boolean (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|boolean|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|boolean|${ value }`
+  boolean (value, timestamp) {
+    return `${ RANDOMS }|boolean|${ RANDOMS }-${ timestamp || null }-${ value }`
   },
 
-  null (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|null|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|null|${ value }`
+  null (value, timestamp) {
+    return `${ RANDOMS }|null|${ RANDOMS }-${ timestamp || null }-${ value }`
   },
 
-  undefined (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|undefined|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|undefined|${ value }`
+  undefined (value, timestamp) {
+    return `${ RANDOMS }|undefined|${ RANDOMS }-${ timestamp || null }-${ value }`
   },
 
-  array (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|array|${ RANDOMS }-${ expiredTime }-${ JSON.stringify(value) }`
-      :`${ RANDOMS }|array|${ JSON.stringify(value) }`
+  array (value, timestamp) {
+    return `${ RANDOMS }|array|${ RANDOMS }-${ timestamp || null }-${ JSON.stringify(value) }`
   },
 
-  object (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|object|${ RANDOMS }-${ expiredTime }-${ JSON.stringify(value) }`
-      : `${ RANDOMS }|object|${ JSON.stringify(value) }`
+  object (value, timestamp) {
+    return `${ RANDOMS }|object|${ RANDOMS }-${ timestamp || null }-${ JSON.stringify(value) }`
   },
 
-  date (value, expiredTime) {
-    return expiredTime
-      ? `${ RANDOMS }|date|${ RANDOMS }-${ expiredTime }-${ value }`
-      : `${ RANDOMS }|date|${ value }`
+  date (value, timestamp) {
+    return `${ RANDOMS }|date|${ RANDOMS }-${ timestamp || null }-${ value }`
   }
 }
 
-const setItem = function (key, value, expiredTime) {
+const setItem = function (key, value, expiresOrDate) {
   try {
     const storageType = getStorageType.call(this)
     const type = getType(value)
-
-    expiredTime = getType(expiredTime) === 'number'
-      ? Date.now() + expiredTime * 1000
-      : expiredTime.getTime()
-
-    const formattedValue = strategies[type](value, expiredTime)
+    const timestamp = getType(expiresOrDate) === 'number'
+      ? Date.now() + expiresOrDate * 1000
+      : expiresOrDate
+          ? expiresOrDate.getTime()
+          : null
+    const formattedValue = strategies[type](value, timestamp)
 
     return window[storageType].setItem(key, formattedValue)
   } catch (e) {

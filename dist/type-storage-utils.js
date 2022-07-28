@@ -98,38 +98,38 @@
   };
 
   var strategies$1 = {
-    string: function string(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|string|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|string|").concat(value);
+    string: function string(value, timestamp) {
+      return "".concat(RANDOMS, "|string|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     },
-    number: function number(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|number|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|number|").concat(value);
+    number: function number(value, timestamp) {
+      return "".concat(RANDOMS, "|number|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     },
-    "boolean": function boolean(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|boolean|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|boolean|").concat(value);
+    "boolean": function boolean(value, timestamp) {
+      return "".concat(RANDOMS, "|boolean|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     },
-    "null": function _null(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|null|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|null|").concat(value);
+    "null": function _null(value, timestamp) {
+      return "".concat(RANDOMS, "|null|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     },
-    undefined: function undefined$1(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|undefined|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|undefined|").concat(value);
+    undefined: function undefined$1(value, timestamp) {
+      return "".concat(RANDOMS, "|undefined|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     },
-    array: function array(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|array|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|array|").concat(JSON.stringify(value));
+    array: function array(value, timestamp) {
+      return "".concat(RANDOMS, "|array|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(JSON.stringify(value));
     },
-    object: function object(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|object|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(JSON.stringify(value)) : "".concat(RANDOMS, "|object|").concat(JSON.stringify(value));
+    object: function object(value, timestamp) {
+      return "".concat(RANDOMS, "|object|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(JSON.stringify(value));
     },
-    date: function date(value, expiredTime) {
-      return expiredTime ? "".concat(RANDOMS, "|date|").concat(RANDOMS, "-").concat(expiredTime, "-").concat(value) : "".concat(RANDOMS, "|date|").concat(value);
+    date: function date(value, timestamp) {
+      return "".concat(RANDOMS, "|date|").concat(RANDOMS, "-").concat(timestamp || null, "-").concat(value);
     }
   };
 
-  var setItem = function setItem(key, value, expiredTime) {
+  var setItem = function setItem(key, value, expiresOrDate) {
     try {
       var storageType = getStorageType.call(this);
       var type = getType(value);
-      expiredTime = getType(expiredTime) === 'number' ? Date.now() + expiredTime * 1000 : expiredTime.getTime();
-      var formattedValue = strategies$1[type](value, expiredTime);
+      var timestamp = getType(expiresOrDate) === 'number' ? Date.now() + expiresOrDate * 1000 : expiresOrDate ? expiresOrDate.getTime() : null;
+      var formattedValue = strategies$1[type](value, timestamp);
       return window[storageType].setItem(key, formattedValue);
     } catch (e) {
       error(e);
@@ -185,18 +185,18 @@
       var parts = value.split('|');
       var hasType = parts[0] === RANDOMS;
       var segments = parts[2].split('-');
-      var hasExpiredTime = segments[0] === RANDOMS;
 
       if (hasType) {
-        var expiredTime = segments[1];
+        var hasExpiresOrDate = segments[0] === RANDOMS;
+        var timestamp = segments[1];
 
-        if (hasExpiredTime && isExpired(expiredTime)) {
+        if (hasExpiresOrDate && isExpired(timestamp)) {
           return null;
         }
 
         var type = parts[1];
 
-        var _value = hasExpiredTime ? parts[2].slice(RANDOMS.length + expiredTime.length + 2) : value.slice(RANDOMS.length + type.length + 2);
+        var _value = value.slice(RANDOMS.length * 2 + type.length + timestamp.length + 4);
 
         return strategies[type](_value);
       }

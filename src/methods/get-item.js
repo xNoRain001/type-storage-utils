@@ -50,19 +50,19 @@ const getItem = function (key) {
     const parts = value.split('|')
     const hasType = parts[0] === RANDOMS
     const segments = parts[2].split('-')
-    const hasExpiredTime = segments[0] === RANDOMS
 
     if (hasType) {
-      const expiredTime = segments[1]
+      const hasExpiresOrDate = segments[0] === RANDOMS
+      const timestamp = segments[1]
 
-      if (hasExpiredTime && isExpired(expiredTime)) {
+      if (hasExpiresOrDate && isExpired(timestamp)) {
         return null
       }
 
       const type = parts[1]
-      const _value = hasExpiredTime
-        ? parts[2].slice(RANDOMS.length + expiredTime.length + 2)
-        : value.slice(RANDOMS.length + type.length + 2)
+      const _value = value.slice(
+        RANDOMS.length * 2 + type.length + timestamp.length + 4
+      )
       
       return strategies[type](_value)
     } 
